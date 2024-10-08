@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>My Wishlist</h1>
+  {% if sneakers|length == 0 %}
+    <h3>Your wishlist is empty</h3>
+  {% else %}
+    <div class="sneaker-grid">
+      {% for sneaker in sneakers %}
+        <div class="sneaker-card">
+          <a href="/sneakers/{{ sneaker.id }}">
+            <img src="{{ sneaker.sneaker_image }}" alt="{{ sneaker.sneaker_name }}" class="sneaker-image"/>
+            <h4>{{ sneaker.sneaker_name }}</h4>
+            <p>{{ sneaker.brand }}</p>
+          </a>
+
+          <!-- Add to Closet Button -->
+          <form action="{{ url_for('add_to_closet', closet_id=sneaker.id) }}" method="post" class="closet-form">
+            <button type="submit" class="closet-button">Closet</button>
+          </form>
+
+          <!-- Remove from Wishlist Button -->
+          <div class="wishlist-actions">
+            <form action="{{ url_for('remove_from_wishlist', wishlist_id=sneaker.id) }}" method="post" class="remove-form">
+              <button type="submit" class="remove-button">Remove</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}
+

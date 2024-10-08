@@ -1,0 +1,9 @@
+{% extends "base.html" %} {% block title %}Home - Sneaker Closet{% endblock %}
+{% block content %}
+<div class="home-hero">
+  <h1>Welcome to Sneaker Closet</h1>
+  <p>Your one-stop shop for managing your sneaker collection</p>
+  <a class="btn" href="{{ url_for('signup') }}">Sign Up</a>
+  <a class="btn" href="{{ url_for('login') }}">Login</a>
+</div>
+{% endblock %}

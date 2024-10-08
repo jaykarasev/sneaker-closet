@@ -1,0 +1,38 @@
+{% extends "base.html" %} {% block title %}{{ user.username }}'s Profile{%
+endblock %} {% block content %}
+<div class="profile">
+  <!-- User Info Section -->
+  <div class="user-info">
+    <img
+      src="{{ user.image_url }}"
+      alt="{{ user.username }}'s profile picture"
+      width="150"
+    />
+    <div class="user-details">
+      <h2>{{ user.full_name }}</h2>
+      <p>@{{ user.username }}</p>
+      <p>Sneaker Size: {{ user.sneaker_size }}</p>
+      <button onclick="window.location.href='/users/profile'">
+        Edit Profile
+      </button>
+    </div>
+  </div>
+
+  <!-- Closet and Wishlist Blocks Section -->
+  <div class="blocks-container">
+    <!-- Closet Block -->
+    <div class="block">
+      <a href="/users/{{ user.id }}/closet">
+        <h3>Closet</h3>
+      </a>
+    </div>
+
+    <!-- Wishlist Block -->
+    <div class="block">
+      <a href="/users/{{ user.id }}/wishlist">
+        <h3>Wishlist</h3>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

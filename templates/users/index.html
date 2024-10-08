@@ -1,0 +1,54 @@
+{% extends 'base.html' %} {% block content %} {% if sneakers|length == 0 %}
+<h3>Sorry, no sneakers found</h3>
+{% else %}
+<div class="sneaker-grid">
+  {% for sneaker in sneakers %}
+  <div class="sneaker-card">
+    <a href="/sneakers/{{ sneaker.id }}">
+      <img
+        src="{{ sneaker.sneaker_image }}"
+        alt="{{ sneaker.sneaker_name }}"
+        class="sneaker-image"
+      />
+      <h4>{{ sneaker.sneaker_name }}</h4>
+      <p>{{ sneaker.brand }}</p>
+    </a>
+
+    {% if g.user %}
+    <div class="sneaker-actions">
+      {% if sneaker in g.user.sneakers_in_closet %}
+      <p>Sneaker is in your closet</p>
+      <form
+        action="{{ url_for('remove_from_closet', closet_id=sneaker.id) }}"
+        method="post"
+      >
+        <button type="submit" class="small-button">Remove</button>
+      </form>
+      {% elif sneaker in g.user.sneakers_in_wishlist %}
+      <p>Sneaker is in your wishlist</p>
+      <form
+        action="{{ url_for('remove_from_wishlist', wishlist_id=sneaker.id) }}"
+        method="post"
+      >
+        <button type="submit" class="small-button">Remove</button>
+      </form>
+      {% else %}
+      <form
+        action="{{ url_for('add_to_closet', closet_id=sneaker.id) }}"
+        method="post"
+      >
+        <button type="submit" class="action-button">Closet</button>
+      </form>
+      <form
+        action="{{ url_for('add_to_wishlist', wishlist_id=sneaker.id) }}"
+        method="post"
+      >
+        <button type="submit" class="action-button">Wishlist</button>
+      </form>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %} {% endblock %}

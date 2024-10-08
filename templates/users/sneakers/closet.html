@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>My Closet</h1>
+  {% if sneakers|length == 0 %}
+    <h3>Your closet is empty</h3>
+  {% else %}
+    <div class="sneaker-grid">
+      {% for sneaker in sneakers %}
+        <div class="sneaker-card">
+          <a href="/sneakers/{{ sneaker.id }}">
+            <img src="{{ sneaker.sneaker_image }}" alt="{{ sneaker.sneaker_name }}" class="sneaker-image"/>
+            <h4>{{ sneaker.sneaker_name }}</h4>
+            <p>{{ sneaker.brand }}</p>
+          </a>
+
+          <!-- Remove Button for Each Sneaker in Closet -->
+          <form action="{{ url_for('remove_from_closet', closet_id=sneaker.id) }}" method="post" class="remove-form">
+            <button type="submit" class="remove-button">Remove</button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}
