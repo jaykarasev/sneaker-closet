@@ -33,6 +33,20 @@ endblock %} {% block content %}
         <h3>Wishlist</h3>
       </a>
     </div>
+
+    <!-- Following Block -->
+    <div class="block">
+      <a href="/users/{{ user.id }}/following">
+        <h3>Following ({{ user.following | length }})</h3>
+      </a>
+    </div>
+
+    <!-- Followers Block -->
+    <div class="block">
+      <a href="/users/{{ user.id }}/followers">
+        <h3>Followers ({{ user.followers | length }})</h3>
+      </a>
+    </div>
   </div>
 </div>
 {% endblock %}

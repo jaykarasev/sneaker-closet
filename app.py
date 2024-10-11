@@ -5,7 +5,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, UserEditForm, LoginForm
-from models import db, connect_db, User, Sneaker, Closet, Wishlist, Follows
+from models import db, connect_db, User, Sneaker, Closet, Wishlist, Follows, Notification
+from datetime import datetime
 
 CURR_USER_KEY = "curr_user"
 
@@ -142,7 +143,7 @@ def list_sneakers():
     else:
         sneakers = Sneaker.query.filter(Sneaker.sneaker_name.ilike(f"%{search}%")).all()
 
-    return render_template('users/index.html', sneakers=sneakers)
+    return render_template('users/sneaker_index.html', sneakers=sneakers)
 
 
 @app.route('/sneakers/<int:sneaker_id>')
@@ -216,11 +217,17 @@ def add_to_closet(closet_id):
     
     # Add the sneaker to the Closet
     db.session.add(new_closet_entry)
+    
+    # Create a notification
+    notification_message = f"{g.user.username} added {added_sneaker.sneaker_name} to Closet"
+    notification = Notification(user_id=g.user.id, message=notification_message, timestamp=datetime.utcnow())
+    db.session.add(notification)
+    
+    # Commit all changes to the database
     db.session.commit()
     
     flash("Sneaker added to closet!", "success")
     return redirect(f"/users/{g.user.id}/closet")
-
 
 
 
@@ -259,11 +266,17 @@ def add_to_wishlist(wishlist_id):
     new_wishlist_entry = Wishlist(user_id=g.user.id, sneaker_id=added_sneaker.id)
     
     db.session.add(new_wishlist_entry)
+    
+    # Create a notification
+    notification_message = f"{g.user.username} added {added_sneaker.sneaker_name} to Wishlist"
+    notification = Notification(user_id=g.user.id, message=notification_message, timestamp=datetime.utcnow())
+    db.session.add(notification)
+    
+    # Commit all changes to the database
     db.session.commit()
     
     flash("Sneaker added to wishlist!", "success")
     return redirect(f"/users/{g.user.id}/wishlist")
-
 
 
 @app.route('/users/remove_wishlist/<int:wishlist_id>', methods=['POST'])
@@ -284,6 +297,77 @@ def remove_from_wishlist(wishlist_id):
 
 ##############################################################################
 # General User related routes:
+
+@app.route('/users')
+def list_users():
+    """Page with listing of users.
+
+    Can take a 'q' param in querystring to search by that username.
+    """
+
+    search = request.args.get('q')
+
+    if not search:
+        users = User.query.filter(User.id != g.user.id).all()
+    else:
+        users = User.query.filter(User.username.ilike(f"%{search}%"), User.id != g.user.id).all()
+
+    return render_template('users/users_index.html', users=users)
+
+
+@app.route('/users/<int:user_id>/following')
+def show_following(user_id):
+    """Show list of people this user is following."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user = User.query.get_or_404(user_id)
+    return render_template('users/social/following.html', user=user)
+
+
+@app.route('/users/<int:user_id>/followers')
+def users_followers(user_id):
+    """Show list of followers of this user."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user = User.query.get_or_404(user_id)
+    return render_template('users/social/followers.html', user=user)
+
+
+@app.route('/users/follow/<int:follow_id>', methods=['POST'])
+def add_follow(follow_id):
+    """Add a follow for the currently-logged-in user."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    followed_user = User.query.get_or_404(follow_id)
+    g.user.following.append(followed_user)
+    db.session.commit()
+
+    return redirect(f"/users/{g.user.id}/following")
+
+
+@app.route('/users/stop-following/<int:follow_id>', methods=['POST'])
+def stop_following(follow_id):
+    """Have currently-logged-in-user stop following this user."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    followed_user = User.query.get(follow_id)
+    g.user.following.remove(followed_user)
+    db.session.commit()
+
+    return redirect(f"/users/{g.user.id}/following")
+
 
 @app.route('/users/<int:user_id>')
 def users_show(user_id):
@@ -351,24 +435,15 @@ def homepage():
     - logged in: 100 most recent messages of followed_users
     """
 
-    return render_template("/home.html")
+    
 
-    # if g.user:
-    #     following_ids = [f.id for f in g.user.following] + [g.user.id]
+    if g.user:
+        following_ids = [f.id for f in g.user.following] + [g.user.id]
 
-    #     messages = (Message
-    #                 .query
-    #                 .filter(Message.user_id.in_(following_ids))
-    #                 .order_by(Message.timestamp.desc())
-    #                 .limit(100)
-    #                 .all())
+        return render_template('home.html')
 
-    #     liked_msg_ids = [msg.id for msg in g.user.likes]
-
-    #     return render_template('home.html', messages=messages, likes=liked_msg_ids)
-
-    # else:
-    #     return render_template('home-anon.html')
+    else:
+        return render_template('home-anon.html')
 
 
 @app.errorhandler(404)

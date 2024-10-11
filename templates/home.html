@@ -1,9 +1,31 @@
-{% extends "base.html" %} {% block title %}Home - Sneaker Closet{% endblock %}
-{% block content %}
-<div class="home-hero">
-  <h1>Welcome to Sneaker Closet</h1>
-  <p>Your one-stop shop for managing your sneaker collection</p>
-  <a class="btn" href="{{ url_for('signup') }}">Sign Up</a>
-  <a class="btn" href="{{ url_for('login') }}">Login</a>
+{% extends 'base.html' %} {% block content %}
+
+<!-- User Search Bar -->
+<div class="search-container mb-4">
+  <form action="/users" method="GET" class="user-search-form">
+    <input
+      name="q"
+      class="form-control"
+      placeholder="Search Users"
+      id="search"
+    />
+    <button class="btn btn-default"></button>
+  </form>
 </div>
-{% endblock %}
+
+<!-- Recent Notifications -->
+{% if g.user %}
+<div class="notifications">
+  {% set notifications = [] %} {% for user in g.user.following %} {% for
+  notification in user.notifications %} {% set _ =
+  notifications.append(notification) %} {% endfor %} {% endfor %} {% for
+  notification in g.user.notifications %} {% set _ =
+  notifications.append(notification) %} {% endfor %} {% set sorted_notifications
+  = notifications | sort(attribute='timestamp', reverse=True) %} {% for
+  notification in sorted_notifications[:10] %}
+  <div class="alert alert-info">{{ notification.message }}</div>
+  {% endfor %}
+</div>
+{% else %}
+<p>Please log in to see recent notifications.</p>
+{% endif %} {% endblock %}

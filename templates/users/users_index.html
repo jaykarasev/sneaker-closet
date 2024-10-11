@@ -1,0 +1,49 @@
+{% extends 'base.html' %} {% block content %}
+<!-- User Search Bar Section -->
+<div class="search-container">
+  <form action="/users" method="GET" class="user-search-form">
+    <input
+      type="text"
+      name="q"
+      placeholder="Search users..."
+      class="user-search-input"
+    />
+    <button type="submit" class="btn btn-primary">Search</button>
+  </form>
+</div>
+
+<!-- Search Results Section -->
+{% if users %} {% if users|length == 0 %}
+<p>No users found with that username.</p>
+{% else %}
+<div class="sneaker-grid">
+  {% for user in users %}
+  <div class="sneaker-card">
+    <a href="/users/{{ user.id }}">
+      <img
+        src="{{ user.image_url }}"
+        alt="{{ user.username }}"
+        class="sneaker-image"
+      />
+      <h4>@{{ user.username }}</h4>
+      <p>{{ user.bio }}</p>
+    </a>
+    {% if g.user %}
+    <div class="sneaker-actions">
+      {% if g.user.is_following(user) %}
+      <form method="POST" action="/users/stop-following/{{ user.id }}">
+        <button class="small-button">Unfollow</button>
+      </form>
+      {% else %}
+      <form method="POST" action="/users/follow/{{ user.id }}">
+        <button class="action-button">Follow</button>
+      </form>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %} {% else %}
+<p>No users found with that username.</p>
+{% endif %} {% endblock %}

@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 
@@ -210,6 +211,18 @@ class Wishlist(db.Model):
 
     user = db.relationship('User', back_populates='sneakers_in_wishlist')
     sneaker = db.relationship('Sneaker', lazy=True)
+
+
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    message = db.Column(db.String, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('notifications', order_by='Notification.timestamp.desc()'))
+
 
 
 def connect_db(app):
