@@ -167,14 +167,15 @@ def sneaker_show(sneaker_id):
 def current_rotation(user_id):
     """Show user's current rotation (top five favored sneakers)."""
 
-    if not g.user or g.user.id != user_id:
+    if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
-    
+
     user = User.query.get_or_404(user_id)
     # Fetch sneakers in rotation
     rotation_sneakers = Closet.query.filter_by(user_id=user.id, is_liked=True).all()
     return render_template('users/sneakers/rotation.html', user=user, sneakers=rotation_sneakers)
+
 
 
 @app.route('/sneakers/<int:sneaker_id>/rotation', methods=['POST'])
@@ -231,7 +232,7 @@ def remove_from_rotation(user_id, sneaker_id):
 @app.route('/users/<int:user_id>/closet')
 def show_closet(user_id):
     """Show list of sneakers that the user owns."""
-    if not g.user or g.user.id != user_id:
+    if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
     
@@ -245,7 +246,7 @@ def show_closet(user_id):
 @app.route('/users/<int:user_id>/wishlist')
 def show_wishlist(user_id):
     """Show list of sneakers on the user's wishlist."""
-    if not g.user or g.user.id != user_id:
+    if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
     
@@ -257,6 +258,7 @@ def show_wishlist(user_id):
     return render_template('users/sneakers/wishlist.html', sneakers=wishlist_sneakers, user=user)
 
 
+# Update closet route
 @app.route('/users/add_own/<int:closet_id>', methods=['POST'])
 def add_to_closet(closet_id):
     """Add a sneaker to the user's closet if it's not already there, and remove it from the wishlist if present."""
@@ -294,8 +296,7 @@ def add_to_closet(closet_id):
     flash("Sneaker added to closet!", "success")
     return redirect(f"/users/{g.user.id}/closet")
 
-
-
+# Remove from closet route
 @app.route('/users/remove_own/<int:closet_id>', methods=['POST'])
 def remove_from_closet(closet_id):
     """Remove sneaker from user's closet."""
@@ -311,10 +312,10 @@ def remove_from_closet(closet_id):
 
     return redirect(f"/users/{g.user.id}/closet")
 
-
+# Update wishlist route
 @app.route('/users/add_wishlist/<int:wishlist_id>', methods=['POST'])
 def add_to_wishlist(wishlist_id):
-    """Add a sneaker to the user's wishlist if it's not already there."""
+    """Add a sneaker to the user's wishlist if it's not already there, and remove it from the closet if present."""
 
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -330,6 +331,11 @@ def add_to_wishlist(wishlist_id):
     added_sneaker = Sneaker.query.get_or_404(wishlist_id)
     new_wishlist_entry = Wishlist(user_id=g.user.id, sneaker_id=added_sneaker.id)
     
+    # Remove the sneaker from the Closet if it exists there
+    closet_entry = Closet.query.filter_by(user_id=g.user.id, sneaker_id=added_sneaker.id).first()
+    if closet_entry:
+        db.session.delete(closet_entry)
+    
     db.session.add(new_wishlist_entry)
     
     # Create a notification
@@ -343,7 +349,7 @@ def add_to_wishlist(wishlist_id):
     flash("Sneaker added to wishlist!", "success")
     return redirect(f"/users/{g.user.id}/wishlist")
 
-
+# Remove from wishlist route
 @app.route('/users/remove_wishlist/<int:wishlist_id>', methods=['POST'])
 def remove_from_wishlist(wishlist_id):
     """Remove sneaker from user's wishlist."""

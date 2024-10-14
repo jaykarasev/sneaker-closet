@@ -1,5 +1,5 @@
-{% extends 'base.html' %} {% block content %}
-<h1>My Closet</h1>
+{% extends "users/profile.html" %} {% block profile_content %}
+<h2>My Closet</h2>
 {% if sneakers|length == 0 %}
 <h3>Your closet is empty</h3>
 {% else %}
