@@ -195,6 +195,7 @@ class Closet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     sneaker_id = db.Column(db.Integer, db.ForeignKey('sneakers.id'), nullable=False)
+    is_liked = db.Column(db.Boolean, default=False)
 
     user = db.relationship('User', back_populates='sneakers_in_closet')
     sneaker = db.relationship('Sneaker', lazy=True)

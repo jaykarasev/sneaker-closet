@@ -1,0 +1,34 @@
+{% extends "base.html" %} {% block title %}{{ user.username }}'s Rotation{%
+endblock %} {% block content %}
+<div class="rotation">
+  <h2>Current Rotation</h2>
+
+  {% if sneakers|length == 0 %}
+  <h3>Your rotation is empty</h3>
+  {% else %}
+  <div class="sneaker-grid">
+    {% for entry in sneakers %}
+    <div class="sneaker-card">
+      <a href="/sneakers/{{ entry.sneaker.id }}">
+        <img
+          src="{{ entry.sneaker.sneaker_image }}"
+          alt="{{ entry.sneaker.sneaker_name }}"
+          class="sneaker-image"
+        />
+        <h4>{{ entry.sneaker.sneaker_name }}</h4>
+        <p>{{ entry.sneaker.brand }}</p>
+      </a>
+
+      <!-- Form to remove sneaker from rotation -->
+      <form
+        action="/users/{{ user.id }}/rotation/remove/{{ entry.sneaker.id }}"
+        method="post"
+      >
+        <button type="submit">Remove from Rotation</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

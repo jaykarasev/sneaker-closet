@@ -1,0 +1,25 @@
+{% extends 'base.html' %} {% block content %}
+<h1>Notifications</h1>
+<!-- Recent Notifications -->
+{% if g.user %}
+<div class="notifications">
+  {% set notifications = [] %} {% for user in g.user.following %} {% for
+  notification in user.notifications %} {% set _ =
+  notifications.append(notification) %} {% endfor %} {% endfor %} {% for
+  notification in g.user.notifications %} {% set _ =
+  notifications.append(notification) %} {% endfor %} {% set sorted_notifications
+  = notifications | sort(attribute='timestamp', reverse=True) %} {% for
+  notification in sorted_notifications[:10] %}
+  <div class="notification-item alert alert-info d-flex align-items-center">
+    <img
+      src="{{ notification.user.image_url }}"
+      alt="{{ notification.username }}"
+      class="notification-profile-pic"
+    />
+    <span>{{ notification.message }}</span>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p>Please log in to see recent notifications.</p>
+{% endif %} {% endblock %}

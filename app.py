@@ -163,6 +163,71 @@ def sneaker_show(sneaker_id):
     return render_template('users/sneakers/show.html', sneaker=sneaker)
 
 
+@app.route('/users/<int:user_id>/rotation')
+def current_rotation(user_id):
+    """Show user's current rotation (top five favored sneakers)."""
+
+    if not g.user or g.user.id != user_id:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    
+    user = User.query.get_or_404(user_id)
+    # Fetch sneakers in rotation
+    rotation_sneakers = Closet.query.filter_by(user_id=user.id, is_liked=True).all()
+    return render_template('users/sneakers/rotation.html', user=user, sneakers=rotation_sneakers)
+
+
+@app.route('/sneakers/<int:sneaker_id>/rotation', methods=['POST'])
+def adding_sneaker_rotation(sneaker_id):
+    """Add or remove sneaker from current rotation (top five liked sneakers)."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    sneaker_entry = Closet.query.filter_by(user_id=g.user.id, sneaker_id=sneaker_id).first()
+    if not sneaker_entry:
+        flash("Sneaker not found in your closet.", "danger")
+        return redirect(f"/users/{g.user.id}/closet")
+
+    # Toggle like status, ensuring max of 5 sneakers are liked
+    if sneaker_entry.is_liked:
+        sneaker_entry.is_liked = False
+    else:
+        liked_count = Closet.query.filter_by(user_id=g.user.id, is_liked=True).count()
+        if liked_count >= 5:
+            flash("You can only like up to 5 sneakers.", "warning")
+        else:
+            sneaker_entry.is_liked = True
+
+    db.session.commit()
+
+    # Query the current liked sneakers for this user
+    liked_sneakers = Closet.query.filter_by(user_id=g.user.id, is_liked=True).all()
+
+    # Pass liked sneakers to the rotation.html template
+    return render_template('users/sneakers/rotation.html', user=g.user, sneakers=liked_sneakers)
+
+
+@app.route('/users/<int:user_id>/rotation/remove/<int:sneaker_id>', methods=['POST'])
+def remove_from_rotation(user_id, sneaker_id):
+    """Remove sneaker from user's rotation without leaving the page."""
+    
+    if not g.user or g.user.id != user_id:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    
+    # Find the sneaker entry in the Closet and update its status
+    sneaker_entry = Closet.query.filter_by(user_id=user_id, sneaker_id=sneaker_id).first()
+    if sneaker_entry and sneaker_entry.is_liked:
+        sneaker_entry.is_liked = False
+        db.session.commit()
+    
+    # Retrieve updated rotation list to display
+    rotation_sneakers = Closet.query.filter_by(user_id=user_id, is_liked=True).all()
+    return render_template('users/sneakers/rotation.html', user=g.user, sneakers=rotation_sneakers)
+
+
 @app.route('/users/<int:user_id>/closet')
 def show_closet(user_id):
     """Show list of sneakers that the user owns."""
@@ -422,6 +487,28 @@ def delete_user():
 
     return redirect("/signup")
 
+@app.route('/notifications')
+def notifications():
+    """Page for sneaker and follow related notifications"""
+
+    if g.user:
+        notifications = Notification.query.filter_by(user_id=g.user.id).order_by(Notification.timestamp.desc()).all()
+        return render_template('users/notifications.html', notifications=notifications)
+
+    else:
+        flash("You need to log in to view notifications.", "danger")
+        return redirect("/login")
+
+
+
+@app.route('/test-notifications')
+def test_notifications():
+    try:
+        return render_template('users/notifications.html')
+    except Exception as e:
+        print(e)
+        return "Error rendering template"
+
 
 ##############################################################################
 # Homepage and error pages
@@ -440,7 +527,7 @@ def homepage():
     if g.user:
         following_ids = [f.id for f in g.user.following] + [g.user.id]
 
-        return render_template('home.html')
+        return render_template('sneaker_index.html')
 
     else:
         return render_template('home-anon.html')

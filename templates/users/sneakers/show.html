@@ -11,6 +11,40 @@
     <h1>{{ sneaker.sneaker_name }}</h1>
     <h3>{{ sneaker.brand }}</h3>
     <p>Retail Price: ${{ sneaker.retail_price }}</p>
+
+    <div class="sneaker-actions">
+      {% if g.user %} {% if sneaker in g.user.sneakers_in_closet %}
+      <p>Sneaker is in your closet</p>
+      <form
+        action="{{ url_for('remove_from_closet', closet_id=sneaker.id) }}"
+        method="post"
+      >
+        <button type="submit" class="small-button">Remove</button>
+      </form>
+      {% elif sneaker in g.user.sneakers_in_wishlist %}
+      <p>Sneaker is in your wishlist</p>
+      <form
+        action="{{ url_for('remove_from_wishlist', wishlist_id=sneaker.id) }}"
+        method="post"
+      >
+        <button type="submit" class="small-button">Remove</button>
+      </form>
+      {% else %}
+      <form
+        action="{{ url_for('add_to_closet', closet_id=sneaker.id) }}"
+        method="post"
+      >
+        <button type="submit" class="btn btn-secondary">Closet</button>
+      </form>
+      <form
+        action="{{ url_for('add_to_wishlist', wishlist_id=sneaker.id) }}"
+        method="post"
+      >
+        <button type="submit" class="btn btn-secondary">Wishlist</button>
+      </form>
+      {% endif %} {% endif %}
+    </div>
+
     <a href="{{ sneaker.url }}" class="btn btn-primary">Get Sneaker</a>
   </div>
 </div>
