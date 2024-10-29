@@ -1,21 +1,44 @@
-{% extends "base.html" %}
-
-{% block title %}Login - Sneaker Closet{% endblock %}
-
-{% block content %}
-    <div class="login-form">
-        <h2>Login to your account</h2>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login - SoleSpace</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/bootstrap/dist/css/bootstrap.css"
+    />
+    <link rel="stylesheet" href="/static/stylesheets/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="login-page">
+    <div class="container">
+      <div class="login-box">
+        <!-- Title with noto-sans-jp font -->
+        <h2 class="title noto-sans-jp">solespace.</h2>
         <form method="POST" action="{{ url_for('login') }}">
-            {{ form.hidden_tag() }}
-            <div class="form-group">
-                {{ form.username.label }}
-                {{ form.username(class="form-control") }}
-            </div>
-            <div class="form-group">
-                {{ form.password.label }}
-                {{ form.password(class="form-control") }}
-            </div>
-            <button class="btn" type="submit">Login</button>
+          {{ form.hidden_tag() }}
+          <div class="form-group">
+            {{ form.username(placeholder="Username", class="underline-input") }}
+          </div>
+          <div class="form-group">
+            {{ form.password(placeholder="Password", class="underline-input") }}
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg btn-block">
+            Login
+          </button>
+          <div class="signup-link text-center mt-3">
+            <p>
+              <a href="{{ url_for('signup') }}">Sign Up</a>
+            </p>
+          </div>
         </form>
+      </div>
+      <div class="red-circle"></div>
     </div>
-{% endblock %}
+  </body>
+</html>

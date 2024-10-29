@@ -1,7 +1,7 @@
 {% extends "users/profile.html" %} {% block profile_content %}
-<h2>My Closet</h2>
+<h3>CLOSET</h3>
 {% if sneakers|length == 0 %}
-<h3>Your closet is empty</h3>
+<h3>Closet is empty</h3>
 {% else %}
 <div class="sneaker-grid">
   {% for sneaker in sneakers %}
@@ -16,27 +16,28 @@
       <p>{{ sneaker.brand }}</p>
     </a>
 
-    <!-- Remove Button for Each Sneaker in Closet -->
+    <!-- Add Like/Unlike Button -->
+    <form
+      action="{{ url_for('adding_sneaker_rotation', sneaker_id=sneaker.id) }}"
+      method="post"
+      class="closet-form"
+    >
+      {% set liked_count = liked_sneakers|length %} {% if sneaker.is_liked %}
+      <button type="submit" class="closet-button">Unlike</button>
+      {% else %} {% if liked_count < 5 %}
+      <button type="submit" class="closet-button">Rotation</button>
+      {% else %}
+      <button type="submit" class="closet-button" disabled>Like</button>
+      {% endif %} {% endif %}
+    </form>
+
+    <!-- Remove from Closet Button -->
     <form
       action="{{ url_for('remove_from_closet', closet_id=sneaker.id) }}"
       method="post"
       class="remove-form"
     >
       <button type="submit" class="remove-button">Remove</button>
-    </form>
-
-    <!-- Like/Unlike Button -->
-    <form
-      action="{{ url_for('adding_sneaker_rotation', sneaker_id=sneaker.id) }}"
-      method="post"
-    >
-      {% set liked_count = liked_sneakers|length %} {% if sneaker.is_liked %}
-      <button type="submit" class="action-button">Unlike</button>
-      {% else %} {% if liked_count < 5 %}
-      <button type="submit" class="action-button">Like</button>
-      {% else %}
-      <button type="submit" class="action-button" disabled>Like</button>
-      {% endif %} {% endif %}
     </form>
   </div>
   {% endfor %}

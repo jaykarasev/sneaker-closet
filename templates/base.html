@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Sneaker Closet</title>
+    <title>SoleSpace</title>
 
     <link
       rel="stylesheet"
@@ -18,56 +18,113 @@
     />
     <link rel="stylesheet" href="/static/stylesheets/style.css" />
     <link rel="shortcut icon" href="/static/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500&display=swap"
+      rel="stylesheet"
+    />
   </head>
 
   <body class="{% block body_class %}{% endblock %}">
     <nav class="navbar navbar-expand">
       <div class="container-fluid">
-        <div class="navbar-header">
+        <!-- Left section: Logo -->
+        <div class="navbar-left">
           <a href="/sneakers" class="navbar-brand">
-            <img src="/static/images/warbler-logo.png" alt="logo" />
-            <span>Sneaker Closet</span>
+            <img src="/static/images/solespace_icon.png" alt="logo" />
           </a>
         </div>
-        <ul class="nav navbar-nav navbar-right">
-          {% if not g.user %}
-          <li><a href="/signup">Sign up</a></li>
-          <li><a href="/login">Log in</a></li>
-          {% else %}
-          <!-- User Profile -->
-          <li>
-            <a href="/users/{{ g.user.id }}">
-              <img src="{{ g.user.image_url }}" alt="{{ g.user.username }}" />
-            </a>
-          </li>
-          <!-- Sneakers, Closet, Wishlist, Logout Links -->
-          <li><a href="/sneakers">Sneakers</a></li>
-          <li><a href="/users">Users</a></li>
-          <li><a href="/notifications">Notifications</a></li>
-          <li><a href="/logout">Log out</a></li>
 
-          <li>
-            <form class="navbar-form navbar-right" action="/sneakers">
-              <input
-                name="q"
-                class="form-control"
-                placeholder="Search Sneakers"
-                id="search"
-              />
-              <button class="btn btn-default">
-                <span class="fa fa-search"></span>
-              </button>
-            </form>
-          </li>
+        <!-- Center section: Wordmark -->
+        <!-- <div class="navbar-center">
+          <img
+            src="/static/images/solespace_wordmark.png"
+            alt="SoleSpace Wordmark"
+            class="navbar-wordmark"
+          />
+        </div> -->
 
-          {% endif %}
-        </ul>
+        <!-- Right section: User Icons and Search -->
+        <div class="navbar-right">
+          <ul class="nav navbar-nav">
+            {% if not g.user %}
+            <li><a href="/signup">Sign up</a></li>
+            <li><a href="/login">Log in</a></li>
+            {% else %}
+            <li>
+              <a href="/users/{{ g.user.id }}">
+                <img
+                  class="profile-image"
+                  src="{{ g.user.image_url }}"
+                  alt="{{ g.user.username }}"
+                />
+              </a>
+            </li>
+            <li>
+              <a href="/sneakers">
+                <img
+                  class="sneakers-icon"
+                  src="/static/images/sneakers_icon.png"
+                  alt="Sneakers"
+                />
+              </a>
+            </li>
+            <li>
+              <a href="/users">
+                <img
+                  class="users-icon"
+                  src="/static/images/users_icon.png"
+                  alt="Users"
+                />
+              </a>
+            </li>
+            <li>
+              <a href="/notifications">
+                <img
+                  class="notifications-icon"
+                  src="/static/images/notification_icon.png"
+                  alt="Notifications"
+                />
+              </a>
+            </li>
+            <li>
+              <a href="/logout">
+                <img
+                  class="logout-icon"
+                  src="/static/images/logout_icon.png"
+                  alt="Logout"
+                />
+              </a>
+            </li>
+            {% endif %}
+            <!-- Search Container after Logout Icon -->
+            <li class="search-wrapper">
+              <form class="navbar-form" action="/sneakers">
+                <div class="search-container">
+                  <i class="fas fa-search" id="search-icon"></i>
+                  <input
+                    name="q"
+                    type="text"
+                    class="form-control"
+                    placeholder="Search Sneakers"
+                    id="search-input"
+                  />
+                </div>
+              </form>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
+
     <div class="container">
       {% for category, message in get_flashed_messages(with_categories=True) %}
       <div class="alert alert-{{ category }}">{{ message }}</div>
-      {% endfor %} {% block content %} {% endblock %}
+      {% endfor %} {% block content %}{% endblock %}
     </div>
+
+    <!-- Link the JavaScript file just before the closing body tag -->
+    <script src="{{ url_for('static', filename='javascript/main.js') }}"></script>
   </body>
 </html>

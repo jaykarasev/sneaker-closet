@@ -1,5 +1,6 @@
 {% extends "base.html" %} {% block title %}{{ user.username }}'s Profile{%
 endblock %} {% block content %}
+<!-- Profile Section with unique background -->
 <div class="profile">
   <!-- User Info Section -->
   <div class="user-info">
@@ -9,10 +10,9 @@ endblock %} {% block content %}
       width="150"
     />
     <div class="user-details">
-      <h2>{{ user.full_name }}</h2>
+      <h2 class="noto-sans-jp">{{ user.full_name }}</h2>
       <p>@{{ user.username }}</p>
-      <p>Sneaker Size: {{ user.sneaker_size }}</p>
-      <button onclick="window.location.href='/users/profile'">
+      <button class="prof-edit" onclick="window.location.href='/users/profile'">
         Edit Profile
       </button>
     </div>
@@ -23,39 +23,60 @@ endblock %} {% block content %}
     <!-- Rotation Block -->
     <div class="block">
       <a href="/users/{{ user.id }}/rotation">
-        <h3>Rotation</h3>
+        <img
+          class="rotation-icon"
+          src="/static/images/rotation_icon_white.png"
+          alt="Rotation"
+        />
       </a>
     </div>
     <!-- Closet Block -->
     <div class="block">
       <a href="/users/{{ user.id }}/closet">
-        <h3>Closet</h3>
+        <img
+          class="closet-icon"
+          src="/static/images/closet_icon_white.png"
+          alt="Closet"
+        />
       </a>
     </div>
-
     <!-- Wishlist Block -->
     <div class="block">
       <a href="/users/{{ user.id }}/wishlist">
-        <h3>Wishlist</h3>
+        <img
+          class="wishlist-icon"
+          src="/static/images/wishlist_icon_white.png"
+          alt="Wishlist"
+        />
       </a>
     </div>
-
     <!-- Following Block -->
     <div class="block">
       <a href="/users/{{ user.id }}/following">
-        <h3>Following ({{ user.following | length }})</h3>
+        <img
+          class="following-icon"
+          src="/static/images/following_icon_white.png"
+          alt="Following"
+        />
       </a>
     </div>
-
     <!-- Followers Block -->
     <div class="block">
       <a href="/users/{{ user.id }}/followers">
-        <h3>Followers ({{ user.followers | length }})</h3>
+        <img
+          class="followers-icon"
+          src="/static/images/followers_icon_white.png"
+          alt="Followers"
+        />
       </a>
     </div>
   </div>
+</div>
 
-  <!-- Profile Content Block Section -->
-  <div class="content-section">{% block profile_content %}{% endblock %}</div>
+<!-- Content Section with website's main background color -->
+<div class="content-section">
+  {% block profile_content %}
+  <!-- Add your additional content here -->
+  {% endblock %}
 </div>
 {% endblock %}

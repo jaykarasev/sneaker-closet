@@ -1,11 +1,11 @@
 {% extends "users/profile.html" %} {% block profile_content %}
 <div class="rotation">
-  <h2>Current Rotation</h2>
+  <h3>CURRENT ROTATION</h3>
 
   {% if sneakers|length == 0 %}
-  <h3>Your rotation is empty</h3>
+  <h3>No Current Rotation</h3>
   {% else %}
-  <div class="sneaker-grid">
+  <div class="sneaker-rotation">
     {% for entry in sneakers %}
     <div class="sneaker-card">
       <a href="/sneakers/{{ entry.sneaker.id }}">

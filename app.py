@@ -286,8 +286,8 @@ def add_to_closet(closet_id):
     db.session.add(new_closet_entry)
     
     # Create a notification
-    notification_message = f"{g.user.username} added {added_sneaker.sneaker_name} to Closet"
-    notification = Notification(user_id=g.user.id, message=notification_message, timestamp=datetime.utcnow())
+    notification_message = f"@{g.user.username} added {added_sneaker.sneaker_name} to Closet"
+    notification = Notification(user_id=g.user.id, message=notification_message, sneaker_image=added_sneaker.sneaker_image, sneaker_id=added_sneaker.id, timestamp=datetime.utcnow())
     db.session.add(notification)
     
     # Commit all changes to the database
@@ -339,8 +339,8 @@ def add_to_wishlist(wishlist_id):
     db.session.add(new_wishlist_entry)
     
     # Create a notification
-    notification_message = f"{g.user.username} added {added_sneaker.sneaker_name} to Wishlist"
-    notification = Notification(user_id=g.user.id, message=notification_message, timestamp=datetime.utcnow())
+    notification_message = f"@{g.user.username} added {added_sneaker.sneaker_name} to Wishlist"
+    notification = Notification(user_id=g.user.id, message=notification_message, sneaker_image=added_sneaker.sneaker_image, sneaker_id=added_sneaker.id, timestamp=datetime.utcnow())
     db.session.add(notification)
     
     # Commit all changes to the database
@@ -373,17 +373,20 @@ def remove_from_wishlist(wishlist_id):
 def list_users():
     """Page with listing of users.
 
-    Can take a 'q' param in querystring to search by that username.
+    Only show users if a search query ('q') is provided.
     """
-
     search = request.args.get('q')
 
-    if not search:
-        users = User.query.filter(User.id != g.user.id).all()
-    else:
+    if search:
+        # Search for users based on the username, case-insensitive
         users = User.query.filter(User.username.ilike(f"%{search}%"), User.id != g.user.id).all()
+    else:
+        # No search query provided, return an empty list
+        users = []
 
     return render_template('users/users_index.html', users=users)
+
+
 
 
 @app.route('/users/<int:user_id>/following')
@@ -409,7 +412,6 @@ def users_followers(user_id):
     user = User.query.get_or_404(user_id)
     return render_template('users/social/followers.html', user=user)
 
-
 @app.route('/users/follow/<int:follow_id>', methods=['POST'])
 def add_follow(follow_id):
     """Add a follow for the currently-logged-in user."""
@@ -420,9 +422,16 @@ def add_follow(follow_id):
 
     followed_user = User.query.get_or_404(follow_id)
     g.user.following.append(followed_user)
+    
+    # Create a notification for the followed user only
+    notification_message = f"@{g.user.username} followed you"
+    notification = Notification(user_id=followed_user.id, message=notification_message, timestamp=datetime.utcnow())
+    db.session.add(notification)
+    
     db.session.commit()
 
     return redirect(f"/users/{g.user.id}/following")
+
 
 
 @app.route('/users/stop-following/<int:follow_id>', methods=['POST'])
@@ -466,8 +475,6 @@ def edit_profile():
             user.last_name = form.last_name.data
             user.email = form.email.data
             user.image_url = form.image_url.data or "/static/images/default-pic.png"
-            user.header_image_url = form.header_image_url.data or "/static/images/warbler-hero.jpg"
-            user.sneaker_size = form.sneaker_size.data
 
             db.session.commit()
             flash("Profile updated successfully!", "success")
@@ -519,24 +526,10 @@ def test_notifications():
 ##############################################################################
 # Homepage and error pages
 
-
 @app.route('/')
 def homepage():
-    """Show homepage:
-
-    - anon users: no messages
-    - logged in: 100 most recent messages of followed_users
-    """
-
-    
-
-    if g.user:
-        following_ids = [f.id for f in g.user.following] + [g.user.id]
-
-        return render_template('sneaker_index.html')
-
-    else:
-        return render_template('home-anon.html')
+    """Redirect to the sneakers listing page."""
+    return redirect('/sneakers')
 
 
 @app.errorhandler(404)

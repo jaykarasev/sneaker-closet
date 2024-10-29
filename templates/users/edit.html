@@ -1,28 +1,32 @@
 {% extends 'base.html' %} {% block content %}
 
-<div class="row justify-content-md-center">
-  <div class="col-md-4">
-    <h2 class="join-message">Edit Your Profile.</h2>
-    <form method="POST" id="user_form">
-      {{ form.hidden_tag() }} {% for field in form if field.widget.input_type !=
-      'hidden' and field.name != 'password' %} {% for error in field.errors %}
-      <span class="text-danger">{{ error }}</span>
-      {% endfor %} {{ field(placeholder=field.label.text, class="form-control")
-      }} {% endfor %}
+<div class="edit-page">
+  <div class="container">
+    <!-- Background circle behind the content -->
+    <div class="background"></div>
 
-      <p>To confirm changes, enter your password:</p>
-      {% if form.password.errors %} {% for error in form.password.errors %}
-      <span class="text-danger"> {{ error }} </span>
-      {% endfor %} {% endif %} {{ form.password(placeholder="Enter your password
-      to confirm", class="form-control") }}
+    <!-- Content section -->
+    <div class="content noto-sans-jp">
+      <h2 class="title">Edit User</h2>
+      <form method="POST" id="user_form">
+        {{ form.hidden_tag() }} {% for field in form if field.widget.input_type
+        != 'hidden' and field.name != 'password' %} {% for error in field.errors
+        %}
+        <span class="text-danger">{{ error }}</span>
+        {% endfor %} {{ field(placeholder=field.label.text,
+        class="underline-input") }} {% endfor %} {% for error in
+        form.password.errors %}
+        <span class="text-danger">{{ error }}</span>
+        {% endfor %} {{ form.password(placeholder="Enter Password to Confirm",
+        class="underline-input") }}
 
-      <div class="edit-btn-area">
-        <button class="btn btn-success">Edit this user!</button>
-        <a href="/users/{{ user_id }}" class="btn btn-outline-secondary"
-          >Cancel</a
-        >
-      </div>
-    </form>
+        <!-- Stacked Buttons Area -->
+        <div class="edit-btn-area">
+          <button class="btn edit-btn">Edit User</button>
+          <a href="/users/{{ user_id }}" class="btn cancel-btn">Cancel</a>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 

@@ -1,25 +1,50 @@
 {% extends 'base.html' %} {% block content %}
-<h1>Notifications</h1>
-<!-- Recent Notifications -->
-{% if g.user %}
-<div class="notifications">
-  {% set notifications = [] %} {% for user in g.user.following %} {% for
-  notification in user.notifications %} {% set _ =
-  notifications.append(notification) %} {% endfor %} {% endfor %} {% for
-  notification in g.user.notifications %} {% set _ =
-  notifications.append(notification) %} {% endfor %} {% set sorted_notifications
-  = notifications | sort(attribute='timestamp', reverse=True) %} {% for
-  notification in sorted_notifications[:10] %}
-  <div class="notification-item alert alert-info d-flex align-items-center">
-    <img
-      src="{{ notification.user.image_url }}"
-      alt="{{ notification.username }}"
-      class="notification-profile-pic"
-    />
-    <span>{{ notification.message }}</span>
+<div class="notifications-page">
+  <h1 class="page-title">Notifications</h1>
+
+  {% if g.user %}
+  <div class="container notifications">
+    {% set notifications = [] %}
+
+    <!-- Collect sneaker-related notifications from followed users -->
+    {% for user in g.user.following %} {% for notification in user.notifications
+    %} {% if "added" in notification.message %} {% set _ =
+    notifications.append(notification) %} {% endif %} {% endfor %} {% endfor %}
+
+    <!-- Collect follow notifications related to the logged-in user -->
+    {% for notification in g.user.notifications %} {% if "followed you" in
+    notification.message %} {% set _ = notifications.append(notification) %} {%
+    endif %} {% endfor %}
+
+    <!-- Sort and display the most recent 10 notifications -->
+    {% set sorted_notifications = notifications | sort(attribute='timestamp',
+    reverse=True) %} {% for notification in sorted_notifications[:10] %}
+    <div class="notification d-flex align-items-center">
+      <!-- Profile picture of the user who triggered the notification -->
+      <img
+        src="{{ notification.user.image_url }}"
+        alt="{{ notification.user.username }}"
+        class="profile-pic notification-profile-pic"
+      />
+
+      <!-- Notification message content -->
+      <p class="notification-message">{{ notification.message }}</p>
+
+      <!-- Sneaker image at the end of the notification -->
+      {% if notification.sneaker_image %}
+      <a href="/sneakers/{{ notification.sneaker_id }}">
+        <img
+          src="{{ notification.sneaker_image }}"
+          alt="Sneaker image"
+          class="sneaker-pic notification-sneaker-pic"
+        />
+      </a>
+      {% endif %}
+    </div>
+    {% endfor %}
   </div>
-  {% endfor %}
+  {% else %}
+  <p>Please log in to see recent notifications.</p>
+  {% endif %}
 </div>
-{% else %}
-<p>Please log in to see recent notifications.</p>
-{% endif %} {% endblock %}
+{% endblock %}

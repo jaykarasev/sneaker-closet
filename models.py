@@ -220,9 +220,12 @@ class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     message = db.Column(db.String, nullable=False)
+    sneaker_image = db.Column(db.String, nullable=True)  # Add this line for the image URL
+    sneaker_id = db.Column(db.Integer, db.ForeignKey('sneakers.id'), nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
+    
     user = db.relationship('User', backref=db.backref('notifications', order_by='Notification.timestamp.desc()'))
+
 
 
 

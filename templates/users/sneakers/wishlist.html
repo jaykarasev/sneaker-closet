@@ -1,7 +1,7 @@
 {% extends "users/profile.html" %} {% block profile_content %}
-<h2>My Wishlist</h2>
+<h3>WISHLIST</h3>
 {% if sneakers|length == 0 %}
-<h3>Your wishlist is empty</h3>
+<h3>Wishlist is empty</h3>
 {% else %}
 <div class="sneaker-grid">
   {% for sneaker in sneakers %}
@@ -26,15 +26,14 @@
     </form>
 
     <!-- Remove from Wishlist Button -->
-    <div class="wishlist-actions">
-      <form
-        action="{{ url_for('remove_from_wishlist', wishlist_id=sneaker.id) }}"
-        method="post"
-        class="remove-form"
-      >
-        <button type="submit" class="remove-button">Remove</button>
-      </form>
-    </div>
+
+    <form
+      action="{{ url_for('remove_from_wishlist', wishlist_id=sneaker.id) }}"
+      method="post"
+      class="remove-form"
+    >
+      <button type="submit" class="remove-button">Remove</button>
+    </form>
   </div>
   {% endfor %}
 </div>
